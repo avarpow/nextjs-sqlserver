@@ -1,0 +1,39 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlserver"
+  url      = "sqlserver://localhost:1433;Database=JY;initialCatalog=sample;integratedSecurity=true;trustServerCertificate=true;"
+}
+
+model book {
+  book_id         String   @id(map: "PK__book__490D1AE1F205625F") @db.Char(8)
+  book_name       String   @db.NVarChar(50)
+  book_isbn       String   @db.Char(17)
+  book_author     String   @db.NVarChar(10)
+  book_publisher  String   @db.NVarChar(50)
+  interview_times Int?
+  price           Float    @db.Money
+  record          record[] @ignore
+}
+
+model reader {
+  reader_id         String   @id(map: "PK__reader__40E382880D4C34EC") @db.Char(8)
+  reader_name       String   @db.NVarChar(50)
+  reader_sex        String   @db.Char(2)
+  reader_department String   @db.NVarChar(60)
+  record            record[] @ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model record {
+  reader_id   String   @db.Char(8)
+  book_id     String   @db.Char(8)
+  borrow_date DateTime @unique @db.Date
+  return_data DateTime @db.Date
+  notes       String?  @db.NVarChar(50)
+  book        book     @relation(fields: [book_id], references: [book_id], onUpdate: NoAction, map: "FK__record__book_id__2B3F6F97")
+  reader      reader   @relation(fields: [reader_id], references: [reader_id], onUpdate: NoAction, map: "FK__record__reader_i__2A4B4B5E")
+
+}
